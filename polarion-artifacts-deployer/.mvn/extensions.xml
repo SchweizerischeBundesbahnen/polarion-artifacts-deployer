@@ -1,3 +1,4 @@
+<!-- it works but there are a lot of warnings are printed which cannot be fixed -->
 <extensions>
     <extension>
         <groupId>com.github.seahen</groupId>
