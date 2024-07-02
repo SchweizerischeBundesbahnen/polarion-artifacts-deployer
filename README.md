@@ -20,5 +20,5 @@ polarion-artifacts-deployer.py --polarion-home C:\Polarion --action install
 ```
 To deploy to remote maven repository:
 ```bash
-polarion-artifacts-deployer.py --polarion-home C:\Polarion --action deploy --repository-id polarion.mvn --repository-url https://bin.sbb.ch/artifactory/polarion.mvn
+polarion-artifacts-deployer.py --polarion-home C:\Polarion --action deploy --repository-id <<private-maven-repo-id-from-settings.xml>> --repository-url https://<<private-maven-repo-url>>
 ```

@@ -9,12 +9,6 @@ import textwrap
 """
 # basic usage:
 python ./polarion-artifacts-deployer.py --polarion-home <polarion_home> --polarion-version <version>
-
-# S3 usage --> ToDo: only possible for Adam right now and the configuration without AWS_PROFILE must be implemented sometime or move to external Maven Repo like repsy.io
-export AWS_DEFAULT_REGION=eu-central-1
-export AWS_PROFILE=lz-polarion-nonprod
-aws-azure-login --all-profiles --no-sandbox --mode=gui
-python ./polarion-artifacts-deployer.py --action deploy --polarion-home ./Polarion/ --polarion-version 2310 --repository-id polarion.mvn --repository-url s3://sbb-polarion-maven-repo/polarion.mvn
 """
 
 

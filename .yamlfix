@@ -1,3 +1,0 @@
-allow_duplicate_keys = false
-line_length = 120
-sequence_style = "flow_style"
