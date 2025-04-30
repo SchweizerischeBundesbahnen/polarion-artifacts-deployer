@@ -3,12 +3,14 @@ name: release-please
 on:
   push:
     branches: [main]
-permissions:
-  contents: write
-  pull-requests: write
+  workflow_dispatch:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: release-please
         id: release
