@@ -79,7 +79,7 @@ def separator():
     print('-' * 20)
 
 
-def process_bundles_folders(folder_names, version, bundles_as_mvn_deps, jars_in_bundles_as_mvn_deps):
+def process_bundles_folders(folder_names, version, jars_in_bundles_as_mvn_deps):
     for plugin_name in folder_names:
         print('handling ' + plugin_name + ' ...')
         plugin_name_tokens = plugin_name.split('_')
@@ -92,7 +92,7 @@ def process_jars_in_bundles_folders(plugin_name, group_id, version, jars_in_bund
     for entry_name in os.listdir(polarion_plugin_path):
         if entry_name.endswith('.jar'):
             jar_path = polarion_plugin_path + os.sep + entry_name
-            artifact_id = entry_name[0 : len(entry_name) - 4]
+            artifact_id = entry_name[0: len(entry_name) - 4]
             mvn_dep = execute_mvn_command(args.mvn_action, jar_path, group_id, artifact_id, version)
             jars_in_bundles_as_mvn_deps.append(mvn_dep)
 
@@ -125,9 +125,9 @@ if __name__ == '__main__':
     plugins_bundles = []
     polarion_jars = []
 
-    for root, dirs, files in os.walk(polarion_plugins_path):
-        for dir in dirs:
-            plugins_bundles.append(dir)
+    for root, folders, files in os.walk(polarion_plugins_path):
+        for folder in folders:
+            plugins_bundles.append(folder)
         for file in files:
             if file.endswith('.jar'):
                 polarion_jars.append(file)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     bundles_mvn_deps = []
     jars_in_bundles_mvn_deps = []
 
-    process_bundles_folders(plugins_bundles, args.polarion_version, bundles_mvn_deps, jars_in_bundles_mvn_deps)
+    process_bundles_folders(plugins_bundles, args.polarion_version, jars_in_bundles_mvn_deps)
     process_bundles_jars(polarion_jars, args.polarion_version, bundles_mvn_deps)
     print('####################################')
     print('Runtime platform maven dependencies:')
