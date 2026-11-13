@@ -5,8 +5,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
-from unittest import mock
 
 SCRIPT = Path(__file__).resolve().parent.parent / 'polarion-artifacts-deployer' / 'polarion-artifacts-deployer.py'
 
@@ -36,10 +36,10 @@ class DeployerTestCase(unittest.TestCase):
         self.which = self.patch(deployer.shutil, 'which', return_value=MVN)
         self.run = self.patch(deployer.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0))
         self.patch(deployer, 'args', new=deployer_args(), create=True)
-        self.patch(sys, 'stdout', new_callable=mock.MagicMock)
+        self.patch(sys, 'stdout', new_callable=unittest.mock.MagicMock)
 
     def patch(self, target, attribute, **kwargs):
-        patcher = mock.patch.object(target, attribute, **kwargs)
+        patcher = unittest.mock.patch.object(target, attribute, **kwargs)
         self.addCleanup(patcher.stop)
         return patcher.start()
 
