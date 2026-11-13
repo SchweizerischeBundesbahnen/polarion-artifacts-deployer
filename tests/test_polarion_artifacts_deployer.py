@@ -118,6 +118,14 @@ class ExecuteMvnCommandTest(DeployerTestCase):
 
         self.assertFalse(self.pom_file.exists())
 
+    def test_leaves_no_pom_when_mvn_is_not_on_the_path(self):
+        self.which.return_value = None
+
+        with self.assertRaises(SystemExit):
+            deployer.execute_mvn_command('install', 'core.jar', 'com.polarion', 'core', '2606')
+
+        self.assertFalse(self.pom_file.exists())
+
 
 class MvnExecutableTest(DeployerTestCase):
 
