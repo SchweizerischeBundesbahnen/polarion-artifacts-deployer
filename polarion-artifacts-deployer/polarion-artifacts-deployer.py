@@ -2,6 +2,9 @@
 
 import argparse
 import os
+import re
+import shutil
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -28,6 +31,14 @@ def write_pom_file_content(pom_file, group_id, artifact_id, version):
         output_file.write(pom_content)
 
 
+def mvn_executable():
+    # Resolved here because no shell looks it up any more; on Windows this finds mvn.cmd.
+    mvn = shutil.which('mvn')
+    if mvn is None:
+        sys.exit('mvn not found on PATH')
+    return mvn
+
+
 def execute_mvn_command(mvn_action, file_name, group_id, artifact_id, version):
     separator()
     print(f'path       : {file_name}')
@@ -38,16 +49,19 @@ def execute_mvn_command(mvn_action, file_name, group_id, artifact_id, version):
     pom_file = tempfile.gettempdir() + os.sep + "pom.xml"
     write_pom_file_content(pom_file, group_id, artifact_id, version)
 
-    mvn_command = f"mvn {mvn_action}:{mvn_action}-file -Dfile={file_name} -DgroupId={group_id} -DartifactId={artifact_id} -Dversion={version} -Dpackaging=jar -DgeneratePom=false -DpomFile={pom_file}"
+    # An argument list without a shell: a path or a version with spaces or shell characters stays one argument.
+    mvn_command = [mvn_executable(), f'{mvn_action}:{mvn_action}-file', f'-Dfile={file_name}', f'-DgroupId={group_id}',
+                   f'-DartifactId={artifact_id}', f'-Dversion={version}', '-Dpackaging=jar', '-DgeneratePom=false',
+                   f'-DpomFile={pom_file}']
 
     if args.settings_path:
-        mvn_command += f' --settings {args.settings_path}'
+        mvn_command += ['--settings', args.settings_path]
 
     if args.repository_id:
-        mvn_command += f' -DrepositoryId={args.repository_id}'
+        mvn_command.append(f'-DrepositoryId={args.repository_id}')
 
     if args.repository_url:
-        mvn_command += f' -Durl={args.repository_url}'
+        mvn_command.append(f'-Durl={args.repository_url}')
 
     mvn_dependency_template = '''\
     <dependency>
@@ -60,12 +74,12 @@ def execute_mvn_command(mvn_action, file_name, group_id, artifact_id, version):
     mvn_dependency = textwrap.dedent(mvn_dependency_template.format(**locals()))
 
     separator()
-    print(mvn_command)
+    print(' '.join(mvn_command))
 
     try:
-        exit_code = os.system(mvn_command)
-        if exit_code > 0:
-            sys.exit(exit_code % 255)
+        exit_code = subprocess.run(mvn_command, check=False).returncode
+        if exit_code != 0:
+            sys.exit(exit_code)
     finally:
         os.remove(pom_file)
 
@@ -115,6 +129,10 @@ if __name__ == '__main__':
     parser.add_argument('--repository-url', metavar='url', dest='repository_url', action='store', help='repository URL to deploy the artifacts')
 
     args = parser.parse_args()
+
+    # The version becomes a Maven coordinate and a mvn argument, so accept only the characters a version uses.
+    if not re.fullmatch(r'[0-9A-Za-z][0-9A-Za-z._-]*', args.polarion_version):
+        parser.error(f'invalid Polarion version: {args.polarion_version!r}')
 
     print('polarion home = ' + args.polarion_home)
     print('polarion version = ' + args.polarion_version)
