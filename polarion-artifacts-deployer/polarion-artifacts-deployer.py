@@ -46,11 +46,14 @@ def execute_mvn_command(mvn_action, file_name, group_id, artifact_id, version):
     print(f'artifactId : {artifact_id}')
     print(f'version    : {version}')
 
+    # Looked up before the pom is written: when mvn is missing, the exit leaves no temporary file behind.
+    mvn = mvn_executable()
+
     pom_file = tempfile.gettempdir() + os.sep + "pom.xml"
     write_pom_file_content(pom_file, group_id, artifact_id, version)
 
     # An argument list without a shell: a path or a version with spaces or shell characters stays one argument.
-    mvn_command = [mvn_executable(), f'{mvn_action}:{mvn_action}-file', f'-Dfile={file_name}', f'-DgroupId={group_id}',
+    mvn_command = [mvn, f'{mvn_action}:{mvn_action}-file', f'-Dfile={file_name}', f'-DgroupId={group_id}',
                    f'-DartifactId={artifact_id}', f'-Dversion={version}', '-Dpackaging=jar', '-DgeneratePom=false',
                    f'-DpomFile={pom_file}']
 
