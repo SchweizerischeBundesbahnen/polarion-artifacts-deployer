@@ -2,7 +2,7 @@
 
 import argparse
 import os
-import shlex
+import re
 import shutil
 import subprocess
 import sys
@@ -74,7 +74,7 @@ def execute_mvn_command(mvn_action, file_name, group_id, artifact_id, version):
     mvn_dependency = textwrap.dedent(mvn_dependency_template.format(**locals()))
 
     separator()
-    print(shlex.join(mvn_command))
+    print(' '.join(mvn_command))
 
     try:
         exit_code = subprocess.run(mvn_command, check=False).returncode
@@ -129,6 +129,10 @@ if __name__ == '__main__':
     parser.add_argument('--repository-url', metavar='url', dest='repository_url', action='store', help='repository URL to deploy the artifacts')
 
     args = parser.parse_args()
+
+    # The version becomes a Maven coordinate and a mvn argument, so accept only the characters a version uses.
+    if not re.fullmatch(r'[0-9A-Za-z][0-9A-Za-z._-]*', args.polarion_version):
+        parser.error(f'invalid Polarion version: {args.polarion_version!r}')
 
     print('polarion home = ' + args.polarion_home)
     print('polarion version = ' + args.polarion_version)
